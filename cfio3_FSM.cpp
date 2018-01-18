@@ -1,19 +1,22 @@
 #include <stdio.h>
-
-
+#include <global.h>
+#include <cfio3_log.h>
+#include <cfio3_FSM.h>
 
 /**************************SM**********************************/
 SM_VAR* SM_init(int rank,int type,char *message){
 	SM_VAR *var = new SM_VAR;
 	var->rank = rank;
 	var->procs_type = type;
-	if(0 == type){
+	if(proc_client == type){
 		var->state = c_SM_init;
-	}else if(1 == type){
+	}else if(proc_master == type){
 		var->state = m_SM_init;
-	}else{
+	}else if(proc_server == type){
 		var->state = s_SM_init;
-	}	
+	}else{
+		return NULL;
+	}
 	return var;
 }
 
@@ -59,7 +62,7 @@ void client_SM_wait2work(SM_VAR* var){
 }
 
 void client_SM_anyone2error(SM_VAR* var){
-	printf("client SM error! CS:%d\n",var->state);
+	DEBUG("client SM error! CS:%d\n",var->state);
 	var->state = c_SM_error;
 }
 
@@ -106,7 +109,7 @@ void master_SM_work2finish(SM_VAR* var){
 }
 
 void master_SM_anyone2error(SM_VAR* var){
-	printf("master SM error! CS:%d\n",var->state);
+	DEBUG("master SM error! CS:%d\n",var->state);
 	var->state = m_SM_error;
 }
 
@@ -168,7 +171,7 @@ void server_SM_write2finish(SM_VAR* var){
 }
 
 void server_SM_anyone2error(SM_VAR* var){
-	printf("server SM error! CS:%d\n",var->state);
+	DEBUG("server SM error! CS:%d\n",var->state);
 	var->state = s_SM_error;
 }
 

@@ -6,7 +6,7 @@ extern "C"{
 #endif
 
 typedef unsigned char SM_State;
-typedef SM_State(*Procedure)(void *);//函数指针,这儿没用
+//typedef void(*Procedure)(void *);//函数指针,这儿没用
 //状态情况不宜太多。
 enum client_SM_states{ 
     c_SM_init,
@@ -41,35 +41,6 @@ typedef struct _SM_AVR
     char message[256];
 }SM_VAR;  //状态机参数封装
 
-//下述的状态转换表适用于单纯的循环状态机，所以没啥用。调用太过于简单却增加了限制。
-Procedure client_SM_steps[] = {//计算进程状态转换函数表。
-    client_SM_init2work,
-	client_SM_work2wait,
-	client_SM_work2finish,
-    client_SM_wait2work,
-	client_SM_anyone2error,
-    client_SM_error2init
-};
-
-Procedure master_SM_steps[] = {//消息进程状态转换函数表。
-    master_SM_init2wait,
-	master_SM_wait2work,
-	master_SM_work2wait,
-    master_SM_work2finish,
-	master_SM_anyone2error,
-    master_SM_error2init
-};
-
-Procedure server_SM_steps[] = {//IO进程状态转换函数表。
-    server_SM_init2wait,
-	server_SM_wait2handle,
-	server_SM_handle2wait,
-    server_SM_handle2write,
-	server_SM_write2wait,
-	server_SM_write2finish,
-	server_SM_anyone2error,
-    server_SM_error2init
-};
 
 SM_VAR* SM_init(int rank,int type,char *message);
 void SM_finilize(SM_VAR* var);
@@ -100,6 +71,39 @@ void server_SM_write2wait(SM_VAR* var);
 void server_SM_write2finish(SM_VAR* var);
 void server_SM_anyone2error(SM_VAR* var);
 void server_SM_error2init(SM_VAR* var);
+
+
+typedef void(*Procedure)(SM_VAR *);//函数指针,这儿没用
+
+//下述的状态转换表适用于单纯的循环状态机，所以没啥用。调用太过于简单却增加了限制。
+Procedure client_SM_steps[] = {//计算进程状态转换函数表。
+    client_SM_init2work,
+	client_SM_work2wait,
+	client_SM_work2finish,
+    client_SM_wait2work,
+	client_SM_anyone2error,
+    client_SM_error2init
+};
+
+Procedure master_SM_steps[] = {//消息进程状态转换函数表。
+    master_SM_init2wait,
+	master_SM_wait2work,
+	master_SM_work2wait,
+    master_SM_work2finish,
+	master_SM_anyone2error,
+    master_SM_error2init
+};
+
+Procedure server_SM_steps[] = {//IO进程状态转换函数表。
+    server_SM_init2wait,
+	server_SM_wait2handle,
+	server_SM_handle2wait,
+    server_SM_handle2write,
+	server_SM_write2wait,
+	server_SM_write2finish,
+	server_SM_anyone2error,
+    server_SM_error2init
+};
 
 #ifdef __cplusplus
 }
